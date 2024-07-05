@@ -1,13 +1,13 @@
 import json
 import plotly
 import pandas as pd
-from pickle import load
-
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from flask import Flask, render_template, request
 from plotly.graph_objs import Bar
+from joblib import load
 from sqlalchemy import create_engine
+
 
 class DisasterResponseWebApp:
     """
@@ -27,25 +27,16 @@ class DisasterResponseWebApp:
         """
         Loads data from a SQLite database into a Pandas DataFrame.
         """
-        db_engine = create_engine('sqlite:///./Data/DisasterResponse.db')
+        db_engine = create_engine('sqlite:///../Data/DisasterResponse.db')
         self.data_frame = pd.read_sql_table('DisasterResponse', db_engine)
 
     def fetch_model(self):
         """
         Loads a pre-trained machine learning model.
         """
-        filename = 'Modeling/model.pkl'
+        self.classification_model = load("../Modeling/model.pkl")
 
-        # Ensure the directory exists
-        import os
-        if not os.path.exists('Modeling'):
-            os.makedirs('Modeling')
-
-        # Load the model using pickle
-        with open(filename, 'rb') as file:
-            self.classification_model = load(file)
-
-    def tokenize(self, text):
+    def text_tokenizer(self, text):
         """
         Tokenizes and lemmatizes text.
 
@@ -131,6 +122,7 @@ class DisasterResponseWebApp:
         Runs the Flask web application.
         """
         self.web_app.run(host='0.0.0.0', port=1309, debug=True)
+
 
 if __name__ == '__main__':
     app = DisasterResponseWebApp()
